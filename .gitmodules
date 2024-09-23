@@ -1,0 +1,9 @@
+[submodule "lib/Libft"]
+	path = lib/Libft
+	url = git@github.com:JaigonzaDev/Libft.git
+[submodule "lib/Ft_printf"]
+	path = lib/Ft_printf
+	url = git@github.com:JaigonzaDev/Ft_printf.git
+[submodule "lib/Get_next_line"]
+	path = lib/Get_next_line
+	url = git@github.com:JaigonzaDev/Get_next_line.git
