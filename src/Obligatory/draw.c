@@ -24,8 +24,8 @@ void isometric(float *x, float *y, int z)
     float previous_x = *x;
     float previous_y = *y;
 
-    *x = (previous_x - previous_y) * cos(0.8);
-    *y = (previous_x + previous_y) * sin(0.8) - z;
+    *x = (previous_x - previous_y) * cos(0.6);
+    *y = (previous_x + previous_y) * sin(0.6) - z;
 }
 
 // Función para aplicar la traslación según los datos de desplazamiento
@@ -65,7 +65,7 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     // Asignar color según las alturas z sin operador ternario
     if (z != 0 || z1 != 0)
     {
-        data->color = 0xffffff; // Color para puntos con z distinta de 0
+        data->color = 0x1234ff; // Color para puntos con z distinta de 0
     }
     else
     {

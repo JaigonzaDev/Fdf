@@ -66,7 +66,7 @@ AR = ar -rcs
 RM = rm -rf
 
 # Librerías externas (libft, get_next_line, ft_printf, minilibx)
-LIBS = -L$(LIBFT_PATH)/lib/Libft -L$(GNL_PATH)/lib -L$(PRINTF_PATH)/lib -L$(MLX_PATH) -lft -lget_next_line -lftprintf -lmlx -lXext -lX11
+LIBS = -L$(LIBFT_PATH)/lib/Libft -L$(GNL_PATH)/lib -L$(PRINTF_PATH)/lib -L$(MLX_PATH) -lm -lft -lget_next_line -lftprintf -lmlx -lXext -lX11
 
 # Reglas principales
 all: libft printf get_next_line minilibx $(NAME)

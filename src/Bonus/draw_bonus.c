@@ -72,7 +72,7 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     }
     else
     {
-        data->color = 0xffffff; // Color para puntos con z igual a 0
+        data->color = 0x1234ff; // Color para puntos con z igual a 0
     }
 
     // Calcular los pasos en x e y
@@ -80,7 +80,7 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     y_step = y1 - y;
 
     // Aplicar la proyección cónica
-    float d = 1000;  // Distancia del observador al plano de proyección (puedes ajustarla)
+    float d = 10;  // Distancia del observador al plano de proyección (puedes ajustarla)
     conic(&x, &y, z, d);       // Aplicar proyección al primer punto
     conic(&x1, &y1, z1, d);    // Aplicar proyección al segundo punto
 
