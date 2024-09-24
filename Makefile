@@ -104,8 +104,9 @@ $(OBLIGATORY_BUILD_PATH)/%.o: $(SRC_OBLIGATORY_PATH)/%.c $(INCLUDE_PATH_FILES_OB
 	$(CC) $(CFLAGS) $(ALL_INCLUDES) -c $< -o $@
 
 # Regla para compilar los archivos objeto bonus
-bonus: libft $(OBJS_BONUS)
+bonus: libft printf get_next_line minilibx $(OBJS_BONUS)
 	@echo "Building bonus..."
+	@mkdir -p $(BIN_PATH)/Bonus
 	@$(CC) $(CFLAGS) $(OBJS_BONUS) $(LIBS) -o $(BIN_PATH)/Bonus/$(NAME)
 	@echo "Bonus built successfully."
 
