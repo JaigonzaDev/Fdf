@@ -24,8 +24,8 @@ void isometric(float *x, float *y, int z)
     float previous_x = *x;
     float previous_y = *y;
 
-    *x = (previous_x - previous_y) * cos(0.6);
-    *y = (previous_x + previous_y) * sin(0.6) - z;
+    *x = (previous_x - previous_y) * cos(0.5);
+    *y = (previous_x + previous_y) * sin(0.5) - z;
 }
 
 // Función para aplicar la traslación según los datos de desplazamiento
@@ -46,14 +46,37 @@ void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
     *y1 *= data->zoom;
 }
 
-// Algoritmo de Bresenham para dibujar líneas entre dos puntos sin operador ternario y sin bucle `while`
+// Función para interpolar entre dos colores basados en un factor (0.0 a 1.0)
+int interpolate_color(int start_color, int end_color, float factor)
+{
+    int r, g, b;
+    int r1, g1, b1;
+    int r2, g2, b2;
+
+    // Extraer los componentes RGB de los colores
+    r1 = (start_color >> 16) & 0xFF;
+    g1 = (start_color >> 8) & 0xFF;
+    b1 = start_color & 0xFF;
+
+    r2 = (end_color >> 16) & 0xFF;
+    g2 = (end_color >> 8) & 0xFF;
+    b2 = end_color & 0xFF;
+
+    // Interpolar los componentes
+    r = (int)(r1 + factor * (r2 - r1));
+    g = (int)(g1 + factor * (g2 - g1));
+    b = (int)(b1 + factor * (b2 - b1));
+
+    // Recombinar los componentes en un único valor RGB
+    return (r << 16) | (g << 8) | b;
+}
+
 void bresenham(float x, float y, float x1, float y1, fdf *data)
 {
     float x_step;
     float y_step;
     int max;
-    int z;
-    int z1;
+    int z, z1;
 
     // Obtener las alturas z de los puntos
     z = data->z_matrix[(int)y][(int)x];
@@ -62,15 +85,9 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     // Aplicar zoom
     data_zoom(&x, &y, &x1, &y1, data);
 
-    // Asignar color según las alturas z sin operador ternario
-    if (z != 0 || z1 != 0)
-    {
-        data->color = 0x1234ff; // Color para puntos con z distinta de 0
-    }
-    else
-    {
-        data->color = 0xffffff; // Color para puntos con z igual a 0
-    }
+    // Definir colores de inicio y final del degradado
+    int color_start = 0xBBFAFF;  // Color base (ej. azul claro para z = 0)
+    int color_end = 0xfc0345;    // Color final (ej. rojo oscuro para z != 0)
 
     // Calcular los pasos en x e y
     x_step = x1 - x;
@@ -88,27 +105,36 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     x_step /= max;
     y_step /= max;
 
-    // Dibujar la línea pixel a pixel usando bucle `for` en lugar de `while`
-    int i;
-    int steps = max; // Número de iteraciones
-
-    for (i = 0; i < steps; i++)
+    // Dibujar la línea pixel a pixel usando un bucle `while`
+    int i = 0;
+    while (i < max)
     {
-        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, data->color);
+        // Calcular el factor de interpolación basado en la posición en la línea
+        float factor = (float)i / max;
+
+        // Interpolar el color entre z y z1
+        int interpolated_color = interpolate_color(color_start, color_end, factor);
+
+        // Dibujar el pixel con el color interpolado
+        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, interpolated_color);
+
+        // Avanzar en los pasos de x e y
         x += x_step;
         y += y_step;
+        i++;
     }
 }
 
-// Función para dibujar la matriz de puntos en la pantalla sin bucles `while`
+// Función para dibujar la matriz de puntos en la pantalla usando bucles `while`
 void draw(fdf *data)
 {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
 
-    for (y = 0; y < data->height; y++)
+    while (y < data->height)
     {
-        for (x = 0; x < data->width; x++)
+        x = 0;
+        while (x < data->width)
         {
             if (x < data->width - 1)
             {
@@ -118,7 +144,9 @@ void draw(fdf *data)
             {
                 bresenham(x, y, x, y + 1, data);
             }
+            x++;
         }
+        y++;
     }
 }
 

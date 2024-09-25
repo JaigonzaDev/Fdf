@@ -49,6 +49,30 @@ void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
     *y1 *= data->zoom;
 }
 
+int interpolate_color(int start_color, int end_color, float factor)
+{
+    int r, g, b;
+    int r1, g1, b1;
+    int r2, g2, b2;
+
+    // Extraer los componentes RGB de los colores
+    r1 = (start_color >> 16) & 0xFF;
+    g1 = (start_color >> 8) & 0xFF;
+    b1 = start_color & 0xFF;
+
+    r2 = (end_color >> 16) & 0xFF;
+    g2 = (end_color >> 8) & 0xFF;
+    b2 = end_color & 0xFF;
+
+    // Interpolar los componentes
+    r = (int)(r1 + factor * (r2 - r1));
+    g = (int)(g1 + factor * (g2 - g1));
+    b = (int)(b1 + factor * (b2 - b1));
+
+    // Recombinar los componentes en un único valor RGB
+    return (r << 16) | (g << 8) | b;
+}
+
 // Algoritmo de Bresenham para dibujar líneas entre dos puntos
 void bresenham(float x, float y, float x1, float y1, fdf *data)
 {
@@ -64,16 +88,8 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
 
     // Aplicar zoom
     data_zoom(&x, &y, &x1, &y1, data);
-
-    // Asignar color según las alturas z
-    if (z != 0 || z1 != 0)
-    {
-        data->color = 0xffffff; // Color para puntos con z distinta de 0
-    }
-    else
-    {
-        data->color = 0x1234ff; // Color para puntos con z igual a 0
-    }
+    int color_start = 0xBBFAFF;  // Color base (ej. azul claro para z = 0)
+    int color_end = 0xfc0345;    // Color final (ej. rojo oscuro para z != 0)
 
     // Calcular los pasos en x e y
     x_step = x1 - x;
@@ -96,7 +112,13 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     int i = 0;
     while (i < max)
     {
-        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, data->color);
+        // Calcular el factor de interpolación basado en la posición en la línea
+        float factor = (float)i / max;
+
+        // Interpolar el color entre z y z1
+        int interpolated_color = interpolate_color(color_start, color_end, factor);
+
+        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, interpolated_color);
         x += x_step;
         y += y_step;
         i++;

@@ -48,7 +48,7 @@ int main(int argc, char **argv)
     
     data->mlx_ptr = mlx_init();
     data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 1000, "FDF");
-    data->zoom = 10;
+    data->zoom = 1;
     data->shift_x = 200;
     data->shift_y = 200;
     
