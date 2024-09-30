@@ -71,12 +71,28 @@ int interpolate_color(int start_color, int end_color, float factor)
     return (r << 16) | (g << 8) | b;
 }
 
-void bresenham(float x, float y, float x1, float y1, fdf *data)
+void alg_xiolin_wu(float x, float y, float x1, float y1, fdf *data)
 {
-    float x_step;
-    float y_step;
-    int max;
+    int i;
+    float dx;
+    float dy;
+    int m;
     int z, z1;
+
+    // Calcular los pasos en x e y
+    dx = x1 - x;
+    dy = y1 - y;
+    m = dy / dx
+    
+
+    // Dibujar la línea pixel a pixel usando un bucle `while`
+    i = 0;
+    while (i <= m)
+    {
+	    x = x0 + i;
+	    y = y0 + i * m;
+    }
+
 
     // Obtener las alturas z de los puntos
     z = data->z_matrix[(int)y][(int)x];
@@ -89,9 +105,6 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     int color_start = 0xBBFAFF;  // Color base (ej. azul claro para z = 0)
     int color_end = 0xfc0345;    // Color final (ej. rojo oscuro para z != 0)
 
-    // Calcular los pasos en x e y
-    x_step = x1 - x;
-    y_step = y1 - y;
 
     // Convertir a isométrico
     isometric(&x, &y, z);
@@ -101,29 +114,11 @@ void bresenham(float x, float y, float x1, float y1, fdf *data)
     data_shift(&x, &y, &x1, &y1, data);
 
     // Determinar el número de pasos en la línea
-    max = MAX(mod(x_step), mod(y_step));
-    x_step /= max;
-    y_step /= max;
-
-    // Dibujar la línea pixel a pixel usando un bucle `while`
-    int i = 0;
-    while (i < max)
-    {
-        // Calcular el factor de interpolación basado en la posición en la línea
-        float factor = (float)i / max;
-
-        // Interpolar el color entre z y z1
-        int interpolated_color = interpolate_color(color_start, color_end, factor);
-
-        // Dibujar el pixel con el color interpolado
-        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, interpolated_color);
-
-        // Avanzar en los pasos de x e y
-        x += x_step;
-        y += y_step;
-        i++;
-    }
+    m = MAX(mod(x_step), mod(y_step));
+    dx /= max;
+    dy /= max;
 }
+
 
 // Función para dibujar la matriz de puntos en la pantalla usando bucles `while`
 void draw(fdf *data)
@@ -138,11 +133,11 @@ void draw(fdf *data)
         {
             if (x < data->width - 1)
             {
-                bresenham(x, y, x + 1, y, data);
+                alg_xiolin_wu(x, y, x + 1, y, data);
             }
             if (y < data->height - 1)
             {
-                bresenham(x, y, x, y + 1, data);
+                alg_xiolin_wu(x, y, x, y + 1, data);
             }
             x++;
         }
