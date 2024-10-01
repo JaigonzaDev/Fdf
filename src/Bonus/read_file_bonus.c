@@ -1,4 +1,4 @@
-#include "fdf_bonus.h"
+#include "fdf.h"
 
 // Contador de palabras que evita espacios consecutivos
 int ft_wdcounter(char *line, char key)

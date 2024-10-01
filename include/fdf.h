@@ -14,14 +14,15 @@ typedef struct
 	int zoom;
 	int shift_x;
 	int shift_y;
-	int color;
+	int z_cheat;
+	int focal_length;
 
 	void *mlx_ptr;
 	void *win_ptr;
 } fdf;
 
 void read_file(char *file_name, fdf *data);
-void bresenham(float x, float y, float x1, float y1, fdf *data);
+void alg_xiolin_xu(float x, float y, float x1, float y1, fdf *data);
 void draw(fdf *data);
 #endif
 

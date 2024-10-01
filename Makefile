@@ -40,9 +40,11 @@ BONUS_BUILD_PATH = $(BUILD_PATH)/Bonus
 
 # Archivos .h
 INCLUDE_FILES_OBLIGATORY = fdf.h
+INCLUDE_FILES_BONUS = fdf_bonus.h
 
 # Include Path and Files
 INCLUDE_PATH_FILES_OBLIGATORY = $(INCLUDE_PATH)/$(INCLUDE_FILES_OBLIGATORY)
+INCLUDE_PATH_FILES_BONUS = $(INCLUDE_PATH)/$(INCLUDE_FILES_BONUS)
 
 # Todos los includes (incluye libft y ft_printf)
 ALL_INCLUDES = -I $(INCLUDE_PATH) -I $(LIBFT_PATH)/include -I $(GNL_PATH)/include -I $(PRINTF_PATH)/include -I $(MLX_PATH)
@@ -110,7 +112,7 @@ bonus: libft printf get_next_line minilibx $(OBJS_BONUS)
 	@$(CC) $(CFLAGS) $(OBJS_BONUS) $(LIBS) -o $(BIN_PATH)/Bonus/$(NAME)
 	@echo "Bonus built successfully."
 
-$(BONUS_BUILD_PATH)/%.o: $(SRC_BONUS_PATH)/%.c $(INCLUDE_PATH_FILES_OBLIGATORY)
+$(BONUS_BUILD_PATH)/%.o: $(SRC_BONUS_PATH)/%.c $(INCLUDE_PATH_FILES_BONUS)
 	@mkdir -p $(BONUS_BUILD_PATH)
 	$(CC) $(CFLAGS) $(ALL_INCLUDES) -c $< -o $@
 

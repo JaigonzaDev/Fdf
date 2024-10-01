@@ -1,34 +1,25 @@
-#include "fdf_bonus.h"
+#include "fdf.h"
 #include <math.h>
 #include <mlx.h>
 
-// Macro para obtener el máximo de dos números
+// Macro para obtener el valor máximo entre dos números
 #define MAX(a, b) (a > b ? a : b)
+
+// Función para intercambiar dos variables flotantes
+void ft_swap(float *a, float *b)
+{
+    float temp = *a;
+    *a = *b;
+    *b = temp;
+}
 
 // Función para calcular el valor absoluto de un número
 float mod(float i)
 {
     if (i < 0)
-    {
         return -i;
-    }
     else
-    {
         return i;
-    }
-}
-
-// Función para aplicar la proyección cónica
-void conic(float *x, float *y, int z, float d)
-{
-    // Si la distancia 'd' es muy pequeña, el factor de proyección tiende a infinito.
-    if (d - z == 0)
-        return;
-
-    float scale = d / (d - z);  // Factor de escala basado en la profundidad (z)
-
-    *x *= scale;  // Ajustar la coordenada x según la profundidad
-    *y *= scale;  // Ajustar la coordenada y según la profundidad
 }
 
 // Función para aplicar la traslación según los datos de desplazamiento
@@ -49,106 +40,130 @@ void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
     *y1 *= data->zoom;
 }
 
-int interpolate_color(int start_color, int end_color, float factor)
+void conic_projection(float *x, float *y, int z, fdf *data)
 {
-    int r, g, b;
-    int r1, g1, b1;
-    int r2, g2, b2;
+    // Distancia focal o punto de fuga (ajusta este valor según el efecto que desees)
+    float d = data->focal_length; // Define el valor en tu estructura fdf, ej. 1000.0
 
-    // Extraer los componentes RGB de los colores
-    r1 = (start_color >> 16) & 0xFF;
-    g1 = (start_color >> 8) & 0xFF;
-    b1 = start_color & 0xFF;
+    // Guarda las coordenadas originales
+    float previous_x = *x;
+    float previous_y = *y;
 
-    r2 = (end_color >> 16) & 0xFF;
-    g2 = (end_color >> 8) & 0xFF;
-    b2 = end_color & 0xFF;
-
-    // Interpolar los componentes
-    r = (int)(r1 + factor * (r2 - r1));
-    g = (int)(g1 + factor * (g2 - g1));
-    b = (int)(b1 + factor * (b2 - b1));
-
-    // Recombinar los componentes en un único valor RGB
-    return (r << 16) | (g << 8) | b;
+    // Aplica la proyección cónica
+    *x = previous_x / (1 + (float)z / d);
+    *y = previous_y / (1 + (float)z / d);
 }
 
-// Algoritmo de Bresenham para dibujar líneas entre dos puntos
-void bresenham(float x, float y, float x1, float y1, fdf *data)
+void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *data)
 {
-    float x_step;
-    float y_step;
-    int max;
-    int z;
-    int z1;
+    int ix, iy;             // Coordenadas enteras de los píxeles
+    float dx, dy;           // Diferencias en x e y
+    float gradient, dist;   // Gradiente (pendiente) y distancia para interpolar colores
+    float x, y;             // Coordenadas actuales (con decimales)
 
-    // Obtener las alturas z de los puntos
-    z = data->z_matrix[(int)y][(int)x];
-    z1 = data->z_matrix[(int)y1][(int)x1];
+    // Aplicar zoom y traslación
+    data_zoom(&x0, &y0, &x1, &y1, data);
 
-    // Aplicar zoom
-    data_zoom(&x, &y, &x1, &y1, data);
-    int color_start = 0xBBFAFF;  // Color base (ej. azul claro para z = 0)
-    int color_end = 0xfc0345;    // Color final (ej. rojo oscuro para z != 0)
-
-    // Calcular los pasos en x e y
-    x_step = x1 - x;
-    y_step = y1 - y;
-
-    // Aplicar la proyección cónica
-    float d = 10;  // Distancia del observador al plano de proyección (puedes ajustarla)
-    conic(&x, &y, z, d);       // Aplicar proyección al primer punto
-    conic(&x1, &y1, z1, d);    // Aplicar proyección al segundo punto
+    // Proyección cónica
+    conic_projection(&x0, &y0, z0, data);
+    conic_projection(&x1, &y1, z1, data);
 
     // Aplicar traslación
-    data_shift(&x, &y, &x1, &y1, data);
+    data_shift(&x0, &y0, &x1, &y1, data);
 
-    // Determinar el número de pasos en la línea
-    max = MAX(mod(x_step), mod(y_step));
-    x_step /= max;
-    y_step /= max;
-
-    // Dibujar la línea pixel a pixel utilizando un bucle `while`
-    int i = 0;
-    while (i < max)
+    // Si el cambio absoluto en y es menor que en x, dibujar horizontalmente
+    if (fabs(y1 - y0) < fabs(x1 - x0))
     {
-        // Calcular el factor de interpolación basado en la posición en la línea
-        float factor = (float)i / max;
+        // Asegurarse de que siempre dibujamos de izquierda a derecha
+        if (x1 < x0)
+        {
+            ft_swap(&x0, &x1);
+            ft_swap(&y0, &y1);
+        }
 
-        // Interpolar el color entre z y z1
-        int interpolated_color = interpolate_color(color_start, color_end, factor);
+        // Calcular las diferencias y el gradiente
+        dx = x1 - x0;
+        dy = y1 - y0;
+        gradient = dy / dx;
 
-        mlx_pixel_put(data->mlx_ptr, data->win_ptr, (int)x, (int)y, interpolated_color);
-        x += x_step;
-        y += y_step;
-        i++;
+        // Dibujar los puntos en el rango de x0 a x1
+        x = x0;
+        y = y0;
+
+        while (x <= x1)
+        {
+            ix = (int)x;
+            iy = (int)y;
+            dist = y - iy;  // Distancia fraccional
+
+            // Dibujar píxeles interpolando colores
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel superior
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11 * data->z_cheat);        // Píxel inferior
+
+            x++;         // Incrementar x en 1
+            y += gradient;  // Incrementar y en función del gradiente
+        }
+    }
+    // Si el cambio absoluto en y es mayor que en x, dibujar verticalmente
+    else
+    {
+        // Asegurarse de que siempre dibujamos de abajo hacia arriba
+        if (y1 < y0)
+        {
+            ft_swap(&x0, &x1);
+            ft_swap(&y0, &y1);
+        }
+
+        // Calcular las diferencias y el gradiente
+        dx = x1 - x0;
+        dy = y1 - y0;
+        gradient = dx / dy;
+
+        // Dibujar los puntos en el rango de y0 a y1
+        x = x0;
+        y = y0;
+
+        while (y <= y1)
+        {
+            ix = (int)x;
+            iy = (int)y;
+            dist = x - ix;  // Distancia fraccional
+
+            // Dibujar píxeles interpolando colores
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel izquierdo
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix + 1, iy, dist * 0xFFFFFF * data->z_cheat);        // Píxel derecho
+
+            y += 1;         // Incrementar y en 1
+            x += gradient;  // Incrementar x en función del gradiente
+        }
     }
 }
-
-// Función para dibujar la matriz de puntos en la pantalla
+// Función para dibujar la matriz de puntos en la pantalla usando bucles `while`
 void draw(fdf *data)
 {
-    int x;
-    int y;
+    int x = 0;
+    int y = 0;
 
-    // Bucle para recorrer la altura de la matriz
-    y = 0;
     while (y < data->height)
     {
-        x = 0;  // Resetear x en cada fila
+        x = 0;
         while (x < data->width)
         {
+            int z = data->z_matrix[y][x];
             if (x < data->width - 1)
             {
-                bresenham(x, y, x + 1, y, data);  // Dibuja línea hacia la derecha
+                int z1 = data->z_matrix[y][x + 1];
+                alg_xiolin_wu(x, y, x + 1, y, z, z1, data); // Dibuja línea horizontal
             }
             if (y < data->height - 1)
             {
-                bresenham(x, y, x, y + 1, data);  // Dibuja línea hacia abajo
+                int z1 = data->z_matrix[y + 1][x];
+                alg_xiolin_wu(x, y, x, y + 1, z, z1, data); // Dibuja línea vertical
             }
-            x++;  // Incrementar x
+            x++;
         }
-        y++;  // Incrementar y
+        y++;
     }
 }
+
 
