@@ -1,13 +1,14 @@
 #include "fdf.h"
-
-#include "fdf.h"
 #include <mlx.h>
 #include <stdio.h>
 
-static void	ft_draw_instructions(fdf *data)
+//static void	ft_draw_instructions(fdf *data)
+
+
+int close_window(void *param)
 {
-	mlx_string_put(data->mlx_ptr, data->win_ptr, 1000, 0, 0xFFFF11,
-		"JAIGONZA");
+    (void)param;
+    exit(0);
 }
 
 int deal_key(int key, fdf *data)
@@ -29,7 +30,7 @@ int deal_key(int key, fdf *data)
         exit(0); // Salir del programa
 
     mlx_clear_window(data->mlx_ptr, data->win_ptr);
-    ft_draw_instructions(data);
+ //   ft_draw_instructions(data);
     draw(data);
     return (0);
 }
@@ -50,18 +51,18 @@ int main(int argc, char **argv)
         ft_printf("Error: Memory allocation failed\n");
         return (1);
     }
-    
     read_file(argv[1], data);
     
     data->mlx_ptr = mlx_init();
     data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
-    data->zoom = 100;
-    data->shift_x = 2000 / 3;
-    data->shift_y = 1000 / 3;
+    data->zoom = 30;
+    data->shift_x = 1000 / 2;
+    data->shift_y = 30;
     data->z_cheat = 8;
     
-    ft_draw_instructions(data);
     draw(data);
+//    ft_draw_instructions(data);
+    mlx_hook(data->win_ptr, 17, 0, close_window, NULL);    
     mlx_key_hook(data->win_ptr, deal_key, data);
     mlx_loop(data->mlx_ptr);
 

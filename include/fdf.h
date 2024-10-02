@@ -16,6 +16,7 @@ typedef struct
 	int shift_y;
 	int z_cheat;
 	int focal_length;
+	float angle;
 
 	void *mlx_ptr;
 	void *win_ptr;

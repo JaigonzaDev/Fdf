@@ -2,9 +2,6 @@
 #include <math.h>
 #include <mlx.h>
 
-// Macro para obtener el valor máximo entre dos números
-#define MAX(a, b) (a > b ? a : b)
-
 // Función para intercambiar dos variables flotantes
 void ft_swap(float *a, float *b)
 {
@@ -95,7 +92,7 @@ void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *
 
             // Dibujar píxeles interpolando colores (parte de Xiaolin Wu)
             mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11) ;      // Píxel superior
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11 * data->z_cheat);        // Píxel inferior
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11);        // Píxel inferior
 
             x++;         // Incrementar x en 1
             y += gradient;  // Incrementar y en función del gradiente
@@ -128,7 +125,7 @@ void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *
 
             // Dibujar píxeles interpolando colores (parte de Xiaolin Wu)
             mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel izquierdo
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix + 1, iy, dist * 0xFFFFFF * data->z_cheat);        // Píxel derecho
+            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix + 1, iy, dist * 0xFFFF11);        // Píxel derecho
 
             y += 1;         // Incrementar y en 1
             x += gradient;  // Incrementar x en función del gradiente

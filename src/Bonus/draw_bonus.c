@@ -2,8 +2,14 @@
 #include <math.h>
 #include <mlx.h>
 
-// Macro para obtener el valor máximo entre dos números
-#define MAX(a, b) (a > b ? a : b)
+void rotate_point(float *x, float *y, float angle)
+{
+    float rad = angle * (M_PI / 180); // Convierte el ángulo a radianes
+    float x_new = *x * cos(rad) - *y * sin(rad);
+    float y_new = *x * sin(rad) + *y * cos(rad);
+    *x = x_new;
+    *y = y_new;
+}
 
 // Función para intercambiar dos variables flotantes
 void ft_swap(float *a, float *b)
@@ -44,7 +50,9 @@ void conic_projection(float *x, float *y, int z, fdf *data)
 {
     // Distancia focal o punto de fuga (ajusta este valor según el efecto que desees)
     float d = data->focal_length; // Define el valor en tu estructura fdf, ej. 1000.0
-
+    
+    if (d <= 0)
+	    d = 1.0;
     // Guarda las coordenadas originales
     float previous_x = *x;
     float previous_y = *y;
@@ -61,6 +69,9 @@ void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *
     float gradient, dist;   // Gradiente (pendiente) y distancia para interpolar colores
     float x, y;             // Coordenadas actuales (con decimales)
 
+    //rotate
+    rotate_point(&x0, &y0, data->angle);
+    rotate_point(&x1, &y1, data->angle);
     // Aplicar zoom y traslación
     data_zoom(&x0, &y0, &x1, &y1, data);
 

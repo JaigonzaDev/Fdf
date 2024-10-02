@@ -1,11 +1,17 @@
 #include "fdf.h"
 #include <mlx.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-static void	ft_draw_instructions(fdf *data)
+int close_window(void *param)
 {
-	mlx_string_put(data->mlx_ptr, data->win_ptr, 1000, 0, 0xFFFF11,
-		"JAIGONZA");
+    (void)param;
+    exit(0);
+}
+
+static void ft_draw_instructions(fdf *data)
+{
+    mlx_string_put(data->mlx_ptr, data->win_ptr, 1000, 0, 0xFFFF11, "JAIGONZA");
 }
 
 int deal_key(int key, fdf *data)
@@ -21,16 +27,26 @@ int deal_key(int key, fdf *data)
         data->shift_x += 10;
     else if (key == 30) // Zoom in (mayúsculas)
         data->zoom += 1;
-    else if (key == 44)
+    else if (key == 44) // Zoom out
         data->zoom -= 1;
     else if (key == 53) // ESC
         exit(0); // Salir del programa
+    else if (key == 38)
+	    data->angle += 10;
+    else if (key == 40)
+	    data->angle -= 10;
+    else if (key == 37)
+	    data->focal_length += 10;
+    else if (key == 4)
+	    data->focal_length -= 10;
+		 
 
     mlx_clear_window(data->mlx_ptr, data->win_ptr);
     ft_draw_instructions(data);
     draw(data);
     return (0);
 }
+
 
 int main(int argc, char **argv)
 {
@@ -53,16 +69,19 @@ int main(int argc, char **argv)
     
     data->mlx_ptr = mlx_init();
     data->win_ptr = mlx_new_window(data->mlx_ptr, 2000, 1000, "FDF");
-    data->zoom = 100;
-    data->shift_x = 2000 / 3;
-    data->shift_y = 1000 / 3;
-    data->z_cheat = 8;
-    data->focal_length = 10;
+    data->zoom = 10;
+    data->shift_x = 1000 ;
+    data->shift_y = 10;
+    data->z_cheat = 8; 
+    data->focal_length = 100;
+    data->angle = 200;
     
     ft_draw_instructions(data);
     draw(data);
+    mlx_hook(data->win_ptr, 17, 0, close_window, NULL);    
     mlx_key_hook(data->win_ptr, deal_key, data);
     mlx_loop(data->mlx_ptr);
 
     return (0);
 }
+
