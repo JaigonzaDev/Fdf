@@ -1,6 +1,8 @@
 #include "fdf.h"
 
-// Contador de palabras que evita espacios consecutivos
+/*
+ *	Count how many char keys are in the give line
+ */
 int ft_wdcounter(char *line, char key)
 {
     int width = 0;
@@ -17,10 +19,12 @@ int ft_wdcounter(char *line, char key)
             in_word = 0;
         line++;
     }
-    return width;
+    return (width);
 }
 
-// Función para calcular la altura del archivo (número de líneas)
+/*
+ *	Get the height counting the lines returned by get_next_line
+ */
 int get_height(char *file_name)
 {
     char *line;
@@ -37,10 +41,12 @@ int get_height(char *file_name)
         free(line);
     }
     close(fd);
-    return height;
+    return (height);
 }
 
-// Función para calcular el ancho (número de columnas)
+/*
+ * Get the width counting the ' ' of the first line
+ */
 int get_width(char *file_name)
 {
     int width;
@@ -49,20 +55,22 @@ int get_width(char *file_name)
 
     fd = open(file_name, O_RDONLY);
     if (fd < 0)
-        return -1;
+        return (-1);
     line = get_next_line(fd);
     if (!line)
     {
         close(fd);
-        return -1;
+        return (-1);
     }
     width = ft_wdcounter(line, ' ');
     free(line);
     close(fd);
-    return width;
+    return (width);
 }
 
-// Función para llenar una fila de la matriz con los valores de la línea
+/*
+ * Divide de line in numbers split by ' '
+ */
 void fill_matrix(int *z_line, char *line)
 {
     char **nums;
@@ -79,41 +87,28 @@ void fill_matrix(int *z_line, char *line)
     free(nums);
 }
 
-// Función para leer el archivo y llenar la matriz de alturas z
+/*
+ *	1. Get de height and width of the map
+ *	2. Assign memory in heap
+ *	3. Fill the matrix
+ */
 void read_file(char *file_name, fdf *data)
 {
     int fd;
     int i;
     char *line;
 
-    // Obtener altura y ancho del archivo
     data->height = get_height(file_name);
     data->width = get_width(file_name);
-
-    // **Añadimos un printf para ver height y width**
-    printf("Altura (height): %d\n", data->height);
-    printf("Ancho (width): %d\n", data->width);
-
     if (data->height <= 0 || data->width <= 0)
-    {
-        printf("Error: archivo inválido\n");
-        return;
-    }
-
-    // Reservar memoria para la matriz
+        return ;
     data->z_matrix = (int **)malloc(sizeof(int *) * data->height);
     i = 0;
     while (i < data->height)
         data->z_matrix[i++] = (int *)malloc(sizeof(int) * data->width);
-
-    // Abrir el archivo y llenar la matriz
     fd = open(file_name, O_RDONLY);
     if (fd < 0)
-    {
-        printf("Error: no se pudo abrir el archivo\n");
-        return;
-    }
-
+        return ;
     i = 0;
     while ((line = get_next_line(fd)) != NULL)
     {

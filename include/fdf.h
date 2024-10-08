@@ -5,7 +5,7 @@
 #include "get_next_line.h"
 #include "ft_printf.h"
 #include "mlx.h"
-
+#include <math.h>
 typedef struct
 {
 	int width;

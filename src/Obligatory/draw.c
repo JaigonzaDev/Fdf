@@ -1,8 +1,8 @@
 #include "fdf.h"
-#include <math.h>
-#include <mlx.h>
 
-// Función para intercambiar dos variables flotantes
+/*
+ *	Swap: a with the b
+ */
 void ft_swap(float *a, float *b)
 {
     float temp = *a;
@@ -10,16 +10,22 @@ void ft_swap(float *a, float *b)
     *b = temp;
 }
 
-// Función para calcular el valor absoluto de un número
+/*
+ *	Returns the absolute value
+ */
 float mod(float i)
 {
     if (i < 0)
-        return -i;
+        return (-i);
     else
-        return i;
+        return (i);
 }
 
-// Función para aplicar la proyección isométrica
+/*
+ * 	Formula:
+ *	'x = x - y * cos()
+ *	'y = x + y * sen() - z
+ */
 void isometric(float *x, float *y, int z, fdf *data)
 {
     float previous_x = *x;
@@ -29,16 +35,21 @@ void isometric(float *x, float *y, int z, fdf *data)
     *y = (previous_x + previous_y) * sin(0.5) - (z * data->z_cheat);
 }
 
-// Función para aplicar la traslación según los datos de desplazamiento
+/*
+ * 	Change x position
+ * 	Change y position
+ */
 void data_shift(float *x, float *y, float *x1, float *y1, fdf *data)
 {
     *x += data->shift_x;
-    *y += data->shift_y;
     *x1 += data->shift_x;
+    *y += data->shift_y;
     *y1 += data->shift_y;
 }
 
-// Función para aplicar el zoom
+/*
+ *	Change zoom 
+ */
 void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
 {
     *x *= data->zoom;
@@ -47,26 +58,36 @@ void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
     *y1 *= data->zoom;
 }
 
+/*
+ * 	1. Set pints values
+ * 	2. Set isometric perspective
+ *	3. Xiaolin Wu -> antialiasing lines
+ */
 // Algoritmo de Xiaolin Wu para dibujar líneas con antialiasing
 void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *data)
 {
-    int ix, iy;             // Coordenadas enteras de los píxeles
-    float dx, dy;           // Diferencias en x e y
-    float gradient, dist;   // Gradiente (pendiente) y distancia para interpolar colores
-    float x, y;             // Coordenadas actuales (con decimales)
+    int ix;             // Coordenadas enteras de los píxeles
+    int iy;
+    float dx;           // Diferencias en x e y
+    float dy;           // Diferencias en x e y
+    float gradient;   // Gradiente (pendiente) y distancia para interpolar colores
+    float dist;   // Gradiente (pendiente) y distancia para interpolar colores
+    float x;             // Coordenadas actuales (con decimales)
+    float y;             // Coordenadas actuales (con decimales)
 
     // Aplicar zoom y traslación
     data_zoom(&x0, &y0, &x1, &y1, data);
+
+    // Aplicar traslación
+    data_shift(&x0, &y0, &x1, &y1, data);
     
     // Proyección isométrica
     isometric(&x0, &y0, z0, data);
     isometric(&x1, &y1, z1, data);
     
-    // Aplicar traslación
-    data_shift(&x0, &y0, &x1, &y1, data);
 
     // Si el cambio absoluto en y es menor que en x, dibujar horizontalmente
-    if (fabs(y1 - y0) < fabs(x1 - x0))
+    if (mod(y1 - y0) < mod(x1 - x0))
     {
         // Asegurarse de que siempre dibujamos de izquierda a derecha
         if (x1 < x0)
@@ -133,27 +154,32 @@ void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *
     }
 }
 
-// Función para dibujar la matriz de puntos en la pantalla usando bucles `while`
+/*
+ *	Draw pixels line x line	
+ */
 void draw(fdf *data)
 {
-    int x = 0;
-    int y = 0;
+    int x;
+    int y;
+    int z;
+    int z1;
 
+    y = 0;
     while (y < data->height)
     {
         x = 0;
         while (x < data->width)
         {
-            int z = data->z_matrix[y][x];
+            z = data->z_matrix[y][x];
             if (x < data->width - 1)
             {
-                int z1 = data->z_matrix[y][x + 1];
-                alg_xiolin_wu(x, y, x + 1, y, z, z1, data); // Dibuja línea horizontal
+                z1 = data->z_matrix[y][x + 1];
+                alg_xiolin_wu(x, y, x + 1, y, z, z1, data);
             }
             if (y < data->height - 1)
             {
-                int z1 = data->z_matrix[y + 1][x];
-                alg_xiolin_wu(x, y, x, y + 1, z, z1, data); // Dibuja línea vertical
+                z1 = data->z_matrix[y + 1][x];
+                alg_xiolin_wu(x, y, x, y + 1, z, z1, data); 
             }
             x++;
         }
