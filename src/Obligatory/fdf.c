@@ -51,12 +51,12 @@ int deal_key(int key, fdf *data)
  */
 void init_data(fdf *data)
 {
-    data = (fdf *)malloc(sizeof(fdf));
+/*    *data = (fdf *)malloc(sizeof(fdf));
     if (!data)
     {
         ft_printf("Error: Memory allocation failed\n");
-        return (1);
-    }
+        return ;
+    }*/
     data->mlx_ptr = mlx_init();
     data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
     data->zoom = 30;
@@ -105,12 +105,12 @@ int check_data (int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-    fdf *data;
+    fdf data;
 
     check_data(argc, argv);
-    init_data(data);
-    read_file(argv[1], data);
-    draw(data);
-    manage_mlx(data);
+    init_data(&data);
+    read_file(argv[1], &data);
+    draw(&data);
+    manage_mlx(&data);
     return (0);
 }
