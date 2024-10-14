@@ -1,47 +1,58 @@
-#include "fdf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/13 20:23:37 by jaigonza          #+#    #+#             */
+/*   Updated: 2024/10/14 17:22:16 by jaigonza         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "fdf.h"
 /*
  *------------------------------------------
  *	Trigger function to close(x) event
  *------------------------------------------
  */
-int close_window(void *param)
+int	close_window(void *param)
 {
-    (void)param;
-    exit(0);
+	(void)param;
+	exit(0);
 }
 
 /*------------------------------------------
- * 	Deal function for keys hooks:
+ * 	Deal function for keys hooks (Linux):
  *------------------------------------------
- *	126 -> Up Arrow
- *	125 -> Down Arrow
- *	124 -> Left Arrow
- *	123 -> Right Arrow
- *	30 -> +
- *	44 -> -
- *	53 -> Esc
+ *	65362 -> Up Arrow
+ *	65364 -> Down Arrow
+ *	65361 -> Left Arrow
+ *	65363 -> Right Arrow
+ *	61 -> +
+ *	45 -> -
+ *	65307 -> Esc
  *------------------------------------------
  */
-int deal_key(int key, fdf *data)
+int	deal_key(int key, t_fdf *data)
 {
-    if (key == 126)
-        data->shift_y -= 10;
-    else if (key == 125)
-        data->shift_y += 10;
-    else if (key == 123)
-        data->shift_x -= 10;
-    else if (key == 124)
-        data->shift_x += 10;
-    else if (key == 30)
-        data->zoom += 1;
-    else if (key == 44)
-        data->zoom -= 1;
-    else if (key == 53)
-        exit(0);
-    mlx_clear_window(data->mlx_ptr, data->win_ptr);
-    draw(data);
-    return (0);
+	if (key == 65362)
+		data->shift_y -= 10;
+	else if (key == 65364)
+		data->shift_y += 10;
+	else if (key == 65361)
+		data->shift_x -= 10;
+	else if (key == 65363)
+		data->shift_x += 10;
+	else if (key == 61)
+		data->zoom += 1;
+	else if (key == 45)
+		data->zoom -= 1;
+	else if (key == 65307)
+		exit(0);
+	mlx_clear_window(data->mlx_ptr, data->win_ptr);
+	draw(data);
+	return (0);
 }
 
 /*
@@ -49,20 +60,14 @@ int deal_key(int key, fdf *data)
  *	Init struct t_fdf
  *------------------------------------------
  */
-void init_data(fdf *data)
+void	init_data(t_fdf *data)
 {
-/*    *data = (fdf *)malloc(sizeof(fdf));
-    if (!data)
-    {
-        ft_printf("Error: Memory allocation failed\n");
-        return ;
-    }*/
-    data->mlx_ptr = mlx_init();
-    data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
-    data->zoom = 30;
-    data->shift_x = 500;
-    data->shift_y = 30;
-    data->z_cheat = 8;
+	data->mlx_ptr = mlx_init();
+	data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
+	data->zoom = 30;
+	data->shift_x = 500;
+	data->shift_y = 30;
+	data->z_cheat = 8;
 }
 
 /*
@@ -72,26 +77,11 @@ void init_data(fdf *data)
  *	Loop waiting for events
  *------------------------------------------
  */
-void manage_mlx(fdf *data)
+void	manage_mlx(t_fdf *data)
 {
-    mlx_hook(data->win_ptr, 17, 0, close_window, NULL);    
-    mlx_key_hook(data->win_ptr, deal_key, data);
-    mlx_loop(data->mlx_ptr);
-}
-
-/*
- *------------------------------------------
- *	Check number of args
- *------------------------------------------
- */
-int check_data (int argc, char **argv)
-{
-    if (argc != 2)
-    {
-        ft_printf("Usage: %s <map_file>\n", argv[0]);
-        return (0);
-    }
-    return (1);
+	mlx_hook(data->win_ptr, 17, 0, close_window, NULL);
+	mlx_key_hook(data->win_ptr, deal_key, data);
+	mlx_loop(data->mlx_ptr);
 }
 
 /*
@@ -100,17 +90,21 @@ int check_data (int argc, char **argv)
  *	2. Init Fdf struct
  *	3. Put de map in matrix
  *	4. Draw de map (line alg - put pixel - isometric view)
- *	5. Manage mlx (hooks, loop) 
+ *	5. Manage mlx (hooks, loop)
  *------------------------------------------
  */
-int main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-    fdf data;
+	t_fdf	data;
 
-    check_data(argc, argv);
-    init_data(&data);
-    read_file(argv[1], &data);
-    draw(&data);
-    manage_mlx(&data);
-    return (0);
+	if (argc != 2)
+	{
+		ft_printf("Usage: %s <map_file>\n", argv[0]);
+		return (1);
+	}
+	init_data(&data);
+	read_file(argv[1], &data);
+	draw(&data);
+	manage_mlx(&data);
+	return (0);
 }

@@ -1,189 +1,67 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/13 20:23:25 by jaigonza          #+#    #+#             */
+/*   Updated: 2024/10/14 17:22:18 by jaigonza         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
-
 /*
- *	Swap: a with the b
+ *  1. Set points values
+ *  2. Apply isometric perspective
+ *  3. Xiaolin Wu's algorithm for antialiasing lines
  */
-void ft_swap(float *a, float *b)
+void	alg_xiolin_wu(t_fpoint fp, t_fdf *data)
 {
-    float temp = *a;
-    *a = *b;
-    *b = temp;
+	data_zoom(&fp, data);
+	data_shift(&fp, data);
+	isometric(&fp.x0, &fp.y0, fp.z0, data);
+	isometric(&fp.x1, &fp.y1, fp.z1, data);
+	draw_line(&fp, data);
+}
+
+void	draw_line_in_direction(t_fpoint *fp, t_fdf *data, int horizontal)
+{
+	if (horizontal)
+	{
+		fp->z1 = data->z_matrix[(int)fp->y0][(int)fp->x0 + 1];
+		fp->x1 = fp->x0 + 1;
+		fp->y1 = fp->y0;
+	}
+	else
+	{
+		fp->z1 = data->z_matrix[(int)fp->y0 + 1][(int)fp->x0];
+		fp->x1 = fp->x0;
+		fp->y1 = fp->y0 + 1;
+	}
+	alg_xiolin_wu(*fp, data);
 }
 
 /*
- *	Returns the absolute value
+ *  Draw lines for the whole matrix, connecting adjacent points
  */
-float mod(float i)
+void	draw(t_fdf *data)
 {
-    if (i < 0)
-        return (-i);
-    else
-        return (i);
+	t_fpoint	fp;
+
+	fp.y0 = 0;
+	while (fp.y0 < data->height)
+	{
+		fp.x0 = 0;
+		while (fp.x0 < data->width)
+		{
+			fp.z0 = data->z_matrix[(int)fp.y0][(int)fp.x0];
+			if (fp.x0 < data->width - 1)
+				draw_line_in_direction(&fp, data, 1);
+			if (fp.y0 < data->height - 1)
+				draw_line_in_direction(&fp, data, 0);
+			fp.x0++;
+		}
+		fp.y0++;
+	}
 }
-
-/*
- * 	Formula:
- *	'x = x - y * cos()
- *	'y = x + y * sen() - z
- */
-void isometric(float *x, float *y, int z, fdf *data)
-{
-    float previous_x = *x;
-    float previous_y = *y;
-
-    *x = (previous_x - previous_y) * cos(0.8);
-    *y = (previous_x + previous_y) * sin(0.5) - (z * data->z_cheat);
-}
-
-/*
- * 	Change x position
- * 	Change y position
- */
-void data_shift(float *x, float *y, float *x1, float *y1, fdf *data)
-{
-    *x += data->shift_x;
-    *x1 += data->shift_x;
-    *y += data->shift_y;
-    *y1 += data->shift_y;
-}
-
-/*
- *	Change zoom 
- */
-void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
-{
-    *x *= data->zoom;
-    *y *= data->zoom;
-    *x1 *= data->zoom;
-    *y1 *= data->zoom;
-}
-
-/*
- * 	1. Set pints values
- * 	2. Set isometric perspective
- *	3. Xiaolin Wu -> antialiasing lines
- */
-// Algoritmo de Xiaolin Wu para dibujar líneas con antialiasing
-void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *data)
-{
-    int ix;             // Coordenadas enteras de los píxeles
-    int iy;
-    float dx;           // Diferencias en x e y
-    float dy;           // Diferencias en x e y
-    float gradient;   // Gradiente (pendiente) y distancia para interpolar colores
-    float dist;   // Gradiente (pendiente) y distancia para interpolar colores
-    float x;             // Coordenadas actuales (con decimales)
-    float y;             // Coordenadas actuales (con decimales)
-
-    // Aplicar zoom y traslación
-    data_zoom(&x0, &y0, &x1, &y1, data);
-
-    // Aplicar traslación
-    data_shift(&x0, &y0, &x1, &y1, data);
-    
-    // Proyección isométrica
-    isometric(&x0, &y0, z0, data);
-    isometric(&x1, &y1, z1, data);
-    
-
-    // Si el cambio absoluto en y es menor que en x, dibujar horizontalmente
-    if (mod(y1 - y0) < mod(x1 - x0))
-    {
-        // Asegurarse de que siempre dibujamos de izquierda a derecha
-        if (x1 < x0)
-        {
-            ft_swap(&x0, &x1);
-            ft_swap(&y0, &y1);
-        }
-
-        // Calcular las diferencias y el gradiente
-        dx = x1 - x0;
-        dy = y1 - y0;
-        gradient = dy / dx;
-
-        // Dibujar los puntos en el rango de x0 a x1
-        x = x0;
-        y = y0;
-
-        while (x <= x1)
-        {
-            ix = (int)x;
-            iy = (int)y;
-            dist = y - iy;  // Distancia fraccional
-
-            // Dibujar píxeles interpolando colores (parte de Xiaolin Wu)
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11) ;      // Píxel superior
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11);        // Píxel inferior
-
-            x++;         // Incrementar x en 1
-            y += gradient;  // Incrementar y en función del gradiente
-        }
-    }
-    // Si el cambio absoluto en y es mayor que en x, dibujar verticalmente
-    else
-    {
-        // Asegurarse de que siempre dibujamos de abajo hacia arriba
-        if (y1 < y0)
-        {
-            ft_swap(&x0, &x1);
-            ft_swap(&y0, &y1);
-        }
-
-        // Calcular las diferencias y el gradiente
-        dx = x1 - x0;
-        dy = y1 - y0;
-        gradient = dx / dy;
-
-        // Dibujar los puntos en el rango de y0 a y1
-        x = x0;
-        y = y0;
-
-        while (y <= y1)
-        {
-            ix = (int)x;
-            iy = (int)y;
-            dist = x - ix;  // Distancia fraccional
-
-            // Dibujar píxeles interpolando colores (parte de Xiaolin Wu)
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel izquierdo
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix + 1, iy, dist * 0xFFFF11);        // Píxel derecho
-
-            y += 1;         // Incrementar y en 1
-            x += gradient;  // Incrementar x en función del gradiente
-        }
-    }
-}
-
-/*
- *	Draw pixels line x line	
- */
-void draw(fdf *data)
-{
-    int x;
-    int y;
-    int z;
-    int z1;
-
-    y = 0;
-    while (y < data->height)
-    {
-        x = 0;
-        while (x < data->width)
-        {
-            z = data->z_matrix[y][x];
-            if (x < data->width - 1)
-            {
-                z1 = data->z_matrix[y][x + 1];
-                alg_xiolin_wu(x, y, x + 1, y, z, z1, data);
-            }
-            if (y < data->height - 1)
-            {
-                z1 = data->z_matrix[y + 1][x];
-                alg_xiolin_wu(x, y, x, y + 1, z, z1, data); 
-            }
-            x++;
-        }
-        y++;
-    }
-}
-

@@ -50,8 +50,8 @@ INCLUDE_PATH_FILES_BONUS = $(INCLUDE_PATH)/$(INCLUDE_FILES_BONUS)
 ALL_INCLUDES = -I $(INCLUDE_PATH) -I $(LIBFT_PATH)/include -I $(GNL_PATH)/include -I $(PRINTF_PATH)/include -I $(MLX_PATH)
 
 # Archivos .c (sin path)
-C_FILES_OBLIGATORY = fdf.c read_file.c draw.c 
-C_FILES_BONUS = fdf_bonus.c read_file_bonus.c draw_bonus.c 
+C_FILES_OBLIGATORY = fdf.c read_file.c draw.c draw_utils.c draw_line_utils.c alg_utils.c
+C_FILES_BONUS = fdf_bonus.c read_file_bonus.c draw_bonus.c draw_utils_bonus.c draw_line_utils_bonus.c alg_utils_bonus.c
 
 # Archivos .c con path
 SRCS_OBLIGATORY = $(addprefix $(SRC_OBLIGATORY_PATH)/, $(C_FILES_OBLIGATORY))

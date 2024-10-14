@@ -1,192 +1,71 @@
-#include "fdf.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   draw_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/10/14 16:43:20 by jaigonza          #+#    #+#             */
+/*   Updated: 2024/10/14 17:56:36 by jaigonza         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void rotate_point(float *x, float *y, float angle)
-{
-    float rad = angle * (M_PI / 180); // Convierte el ángulo a radianes
-    float x_new = *x * cos(rad) - *y * sin(rad);
-    float y_new = *x * sin(rad) + *y * cos(rad);
-    *x = x_new;
-    *y = y_new;
-}
-
-/*
- *	Swap: a with the b
- */
-void ft_swap(float *a, float *b)
-{
-    float temp = *a;
-    *a = *b;
-    *b = temp;
-}
+#include "fdf_bonus.h"
 
 /*
- *	Returns the absolute value
+ *  1. Set points values
+ *  2. Apply isometric perspective
+ *  3. Xiaolin Wu's algorithm for antialiasing lines
  */
-float mod(float i)
+void	alg_xiolin_wu_bonus(t_fpointb fp, t_fdfb *data)
 {
-    if (i < 0)
-        return (-i);
-    else
-        return (i);
+	rotate_point_bonus(&fp.x0, &fp.y0, data->angle);
+	rotate_point_bonus(&fp.x1, &fp.y1, data->angle);
+	data_zoom_bonus(&fp, data);
+	data_shift_bonus(&fp, data);
+	conic_projection_bonus(&fp.x0, &fp.y0, fp.z0, data);
+	conic_projection_bonus(&fp.x1, &fp.y1, fp.z1, data);
+	draw_line_bonus(&fp, data);
 }
 
-/*
- * 	Change x position
- * 	Change y position
- */
-void data_shift(float *x, float *y, float *x1, float *y1, fdf *data)
+void	draw_line_in_direction_bonus(t_fpointb *fp, t_fdfb *data,
+		int horizontal)
 {
-    *x += data->shift_x;
-    *x1 += data->shift_x;
-    *y += data->shift_y;
-    *y1 += data->shift_y;
+	if (horizontal)
+	{
+		fp->z1 = data->z_matrix[(int)fp->y0][(int)fp->x0 + 1];
+		fp->x1 = fp->x0 + 1;
+		fp->y1 = fp->y0;
+	}
+	else
+	{
+		fp->z1 = data->z_matrix[(int)fp->y0 + 1][(int)fp->x0];
+		fp->x1 = fp->x0;
+		fp->y1 = fp->y0 + 1;
+	}
+	alg_xiolin_wu_bonus(*fp, data);
 }
 
-/*
- *	Change zoom 
- */
-void data_zoom(float *x, float *y, float *x1, float *y1, fdf *data)
-{
-    *x *= data->zoom;
-    *y *= data->zoom;
-    *x1 *= data->zoom;
-    *y1 *= data->zoom;
-}
-
-void conic_projection(float *x, float *y, int z, fdf *data)
-{
-    // Distancia focal o punto de fuga (ajusta este valor según el efecto que desees)
-    float d = data->focal_length; // Define el valor en tu estructura fdf, ej. 1000.0
-    
-    if (d <= 0)
-	    d = 1.0;
-    // Guarda las coordenadas originales
-    float previous_x = *x;
-    float previous_y = *y;
-
-    // Aplica la proyección cónica
-    *x = previous_x / (1 + (float)z / d);
-    *y = previous_y / (1 + (float)z / d);
-}
-
-void alg_xiolin_wu(float x0, float y0, float x1, float y1, int z0, int z1, fdf *data)
-{
-    int ix, iy;             // Coordenadas enteras de los píxeles
-    float dx, dy;           // Diferencias en x e y
-    float gradient, dist;   // Gradiente (pendiente) y distancia para interpolar colores
-    float x, y;             // Coordenadas actuales (con decimales)
-
-    //rotate
-    rotate_point(&x0, &y0, data->angle);
-    rotate_point(&x1, &y1, data->angle);
-    // Aplicar zoom y traslación
-    data_zoom(&x0, &y0, &x1, &y1, data);
-
-    // Proyección cónica
-    conic_projection(&x0, &y0, z0, data);
-    conic_projection(&x1, &y1, z1, data);
-
-    // Aplicar traslación
-    data_shift(&x0, &y0, &x1, &y1, data);
-
-    // Si el cambio absoluto en y es menor que en x, dibujar horizontalmente
-    if (fabs(y1 - y0) < fabs(x1 - x0))
-    {
-        // Asegurarse de que siempre dibujamos de izquierda a derecha
-        if (x1 < x0)
-        {
-            ft_swap(&x0, &x1);
-            ft_swap(&y0, &y1);
-        }
-
-        // Calcular las diferencias y el gradiente
-        dx = x1 - x0;
-        dy = y1 - y0;
-        gradient = dy / dx;
-
-        // Dibujar los puntos en el rango de x0 a x1
-        x = x0;
-        y = y0;
-
-        while (x <= x1)
-        {
-            ix = (int)x;
-            iy = (int)y;
-            dist = y - iy;  // Distancia fraccional
-
-            // Dibujar píxeles interpolando colores
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel superior
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11 * data->z_cheat);        // Píxel inferior
-
-            x++;         // Incrementar x en 1
-            y += gradient;  // Incrementar y en función del gradiente
-        }
-    }
-    // Si el cambio absoluto en y es mayor que en x, dibujar verticalmente
-    else
-    {
-        // Asegurarse de que siempre dibujamos de abajo hacia arriba
-        if (y1 < y0)
-        {
-            ft_swap(&x0, &x1);
-            ft_swap(&y0, &y1);
-        }
-
-        // Calcular las diferencias y el gradiente
-        dx = x1 - x0;
-        dy = y1 - y0;
-        gradient = dx / dy;
-
-        // Dibujar los puntos en el rango de y0 a y1
-        x = x0;
-        y = y0;
-
-        while (y <= y1)
-        {
-            ix = (int)x;
-            iy = (int)y;
-            dist = x - ix;  // Distancia fraccional
-
-            // Dibujar píxeles interpolando colores
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);      // Píxel izquierdo
-            mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix + 1, iy, dist * 0xFFFFFF * data->z_cheat);        // Píxel derecho
-
-            y += 1;         // Incrementar y en 1
-            x += gradient;  // Incrementar x en función del gradiente
-        }
-    }
-}
 /*
  *	Draw pixels line x line
  */
-void draw(fdf *data)
+void	draw_bonus(t_fdfb *data)
 {
-    int x;
-    int y;
-    int z;
-    int z1;
+	t_fpointb	fp;
 
-    y = 0;
-    while (y < data->height)
-    {
-        x = 0;
-        while (x < data->width)
-        {
-            z = data->z_matrix[y][x];
-            if (x < data->width - 1)
-            {
-                z1 = data->z_matrix[y][x + 1];
-                alg_xiolin_wu(x, y, x + 1, y, z, z1, data); 
-            }
-            if (y < data->height - 1)
-            {
-                z1 = data->z_matrix[y + 1][x];
-                alg_xiolin_wu(x, y, x, y + 1, z, z1, data);
-            }
-            x++;
-        }
-        y++;
-    }
+	fp.y0 = 0;
+	while (fp.y0 < data->height)
+	{
+		fp.x0 = 0;
+		while (fp.x0 < data->width)
+		{
+			fp.z0 = data->z_matrix[(int)fp.y0][(int)fp.x0];
+			if (fp.x0 < data->width - 1)
+				draw_line_in_direction_bonus(&fp, data, 1);
+			if (fp.y0 < data->height - 1)
+				draw_line_in_direction_bonus(&fp, data, 0);
+			fp.x0++;
+		}
+		fp.y0++;
+	}
 }
-
-
