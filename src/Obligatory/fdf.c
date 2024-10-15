@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 20:23:37 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:22:16 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/15 12:17:07 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	close_window(void *param)
  *	65364 -> Down Arrow
  *	65361 -> Left Arrow
  *	65363 -> Right Arrow
- *	61 -> +
+ *	43 -> +
  *	45 -> -
  *	65307 -> Esc
  *------------------------------------------
@@ -44,7 +44,7 @@ int	deal_key(int key, t_fdf *data)
 		data->shift_x -= 10;
 	else if (key == 65363)
 		data->shift_x += 10;
-	else if (key == 61)
+	else if (key == 43)
 		data->zoom += 1;
 	else if (key == 45)
 		data->zoom -= 1;
@@ -63,7 +63,7 @@ int	deal_key(int key, t_fdf *data)
 void	init_data(t_fdf *data)
 {
 	data->mlx_ptr = mlx_init();
-	data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
+	data->win_ptr = mlx_new_window(data->mlx_ptr, 2000, 1000, "FDF");
 	data->zoom = 30;
 	data->shift_x = 500;
 	data->shift_y = 30;

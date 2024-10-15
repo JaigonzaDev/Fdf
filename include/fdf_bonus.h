@@ -3,6 +3,7 @@
 
 # include "fdf.h"
 
+# define PI 3.14159
 typedef struct s_fdfb
 {
 	int			width;
@@ -11,7 +12,6 @@ typedef struct s_fdfb
 	int			zoom;
 	int			shift_x;
 	int			shift_y;
-	int			z_cheat;
 	int			focal_length;
 	float		angle;
 
@@ -24,7 +24,6 @@ typedef struct s_fputilsb
 	float		dx;
 	float		dy;
 	float		gradient;
-	float		dist;
 }				t_fputilsb;
 
 typedef struct s_fpointb
@@ -52,7 +51,7 @@ void			read_file_bonus(char *file_name, t_fdfb *data);
 void			ft_swap_bonus(float *a, float *b);
 float			mod_bonus(float i);
 void			slope_bonus(t_fpointb *fp);
-void			draw_pixels_bonus(t_fdfb *data, int ix, int iy, float dist);
+void			draw_pixels_bonus(t_fdfb *data, int ix, int iy);
 
 int				close_window_bonus(void *param);
 int				deal_key_bonus(int key, t_fdfb *data);
@@ -69,4 +68,9 @@ void			alg_xiolin_wu_bonus(t_fpointb fp, t_fdfb *data);
 void			draw_line_in_direction_bonus(t_fpointb *fp, t_fdfb *data,
 					int horizontal);
 void			draw_bonus(t_fdfb *data);
+
+void			move_view(int key, t_fdfb *data);
+void			zoom_view(int key, t_fdfb *data);
+void			change_angle(int key, t_fdfb *data);
+void			change_focal_length(int key, t_fdfb *data);
 #endif

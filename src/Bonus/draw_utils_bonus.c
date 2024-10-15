@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 17:14:28 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:15:00 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/15 12:08:34 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,7 @@ void	slope_bonus(t_fpointb *fp)
 	fp->utils.dy = fp->y1 - fp->y0;
 }
 
-void	draw_pixels_bonus(t_fdfb *data, int ix, int iy, float dist)
+void	draw_pixels_bonus(t_fdfb *data, int ix, int iy)
 {
-	mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, (1 - dist) * 0xFFFF11);
-	mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy + 1, dist * 0xFFFF11);
+	mlx_pixel_put(data->mlx_ptr, data->win_ptr, ix, iy, 0xFFFF11);
 }

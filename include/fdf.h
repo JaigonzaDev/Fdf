@@ -16,8 +16,6 @@ typedef struct s_fdf
 	int			shift_x;
 	int			shift_y;
 	int			z_cheat;
-	int			focal_length;
-	float		angle;
 
 	void		*mlx_ptr;
 	void		*win_ptr;
@@ -28,7 +26,6 @@ typedef struct s_fputils
 	float		dx;
 	float		dy;
 	float		gradient;
-	float		dist;
 }				t_fputils;
 
 typedef struct s_fpoint
@@ -61,7 +58,7 @@ void			draw(t_fdf *data);
 void			ft_swap(float *a, float *b);
 float			mod(float i);
 void			slope(t_fpoint *fp);
-void			draw_pixels(t_fdf *data, int ix, int iy, float dist);
+void			draw_pixels(t_fdf *data, int ix, int iy);
 
 void			draw_horizontal_line(t_fpoint *fp, t_fdf *data);
 void			draw_vertical_line(t_fpoint *fp, t_fdf *data);

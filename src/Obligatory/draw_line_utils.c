@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 21:19:35 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:22:15 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/15 12:15:48 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,7 @@ void	draw_horizontal_line(t_fpoint *fp, t_fdf *data)
 	{
 		ix = (int)x;
 		iy = (int)y;
-		fp->utils.dist = y - iy;
-		draw_pixels(data, ix, iy, fp->utils.dist);
+		draw_pixels(data, ix, iy);
 		x++;
 		y += fp->utils.gradient;
 	}
@@ -45,8 +44,7 @@ void	draw_vertical_line(t_fpoint *fp, t_fdf *data)
 	{
 		ix = (int)x;
 		iy = (int)y;
-		fp->utils.dist = x - ix;
-		draw_pixels(data, ix, iy, fp->utils.dist);
+		draw_pixels(data, ix, iy);
 		y++;
 		x += fp->utils.gradient;
 	}

@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 16:43:12 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:56:34 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/15 12:19:15 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,45 +26,18 @@ int	close_window_bonus(void *param)
 /*------------------------------------------
  * 	Deal function for keys hooks:
  *------------------------------------------
- *	126 -> Up Arrow
- *	125 -> Down Arrow
- *	124 -> Left Arrow
- *	123 -> Right Arrow
- *	30 -> +
- *	44 -> -
- *	53 -> Esc
- *	38 -> j
- *	40 -> k
- *	37 -> h
- *		4 -> l
+ *	65307 -> Esc
  *------------------------------------------
  */
-
 int	deal_key_bonus(int key, t_fdfb *data)
 {
 	ft_printf("%d\n", key);
-	if (key == 126)
-		data->shift_y -= 10;
-	else if (key == 125)
-		data->shift_y += 10;
-	else if (key == 123)
-		data->shift_x -= 10;
-	else if (key == 124)
-		data->shift_x += 10;
-	else if (key == 30)
-		data->zoom += 1;
-	else if (key == 44)
-		data->zoom -= 1;
-	else if (key == 53)
+	move_view(key, data);
+	zoom_view(key, data);
+	change_angle(key, data);
+	change_focal_length(key, data);
+	if (key == 65307)
 		exit(0);
-	else if (key == 38)
-		data->angle += 10;
-	else if (key == 40)
-		data->angle -= 10;
-	else if (key == 37)
-		data->focal_length += 10;
-	else if (key == 4)
-		data->focal_length -= 10;
 	mlx_clear_window(data->mlx_ptr, data->win_ptr);
 	draw_bonus(data);
 	return (0);
@@ -78,12 +51,11 @@ int	deal_key_bonus(int key, t_fdfb *data)
 void	init_data_bonus(t_fdfb *data)
 {
 	data->mlx_ptr = mlx_init();
-	data->win_ptr = mlx_new_window(data->mlx_ptr, 1000, 500, "FDF");
+	data->win_ptr = mlx_new_window(data->mlx_ptr, 2000, 1000, "FDF");
 	data->zoom = 30;
-	data->shift_x = 500;
-	data->shift_y = 30;
-	data->z_cheat = 8;
-	data->focal_length = 100;
+	data->shift_x = 600;
+	data->shift_y = 600;
+	data->focal_length = 10;
 	data->angle = 200;
 }
 

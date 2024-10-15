@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 17:12:49 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:56:35 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/15 11:55:53 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	rotate_point_bonus(float *x, float *y, float angle)
 	float	y_new;
 	float	rad;
 
-	rad = angle * (M_PI / 180);
+	rad = angle * (PI / 180);
 	x_new = *x * cos(rad) - *y * sin(rad);
 	y_new = *x * sin(rad) + *y * cos(rad);
 	*x = x_new;
@@ -32,6 +32,8 @@ void	conic_projection_bonus(float *x, float *y, int z, t_fdfb *data)
 	float	d;
 
 	d = data->focal_length;
+	if (d <= 0)
+		d = 1;
 	previous_x = *x;
 	previous_y = *y;
 	*x = previous_x / (1 + (float)z / d);
