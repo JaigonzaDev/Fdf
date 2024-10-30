@@ -7,3 +7,6 @@
 [submodule "lib/Get_next_line"]
 	path = lib/Get_next_line
 	url = git@github.com:JaigonzaDev/Get_next_line.git
+[submodule "lib/minilibx-linux"]
+	path = lib/minilibx-linux
+	url = git@github.com:42Paris/minilibx-linux.git
