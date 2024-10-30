@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/14 16:42:53 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:46:14 by jaigonza         ###   ########.fr       */
+/*   Created: 2024/10/30 15:39:03 by jaigonza          #+#    #+#             */
+/*   Updated: 2024/10/30 16:02:00 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,19 +87,21 @@ int	get_width_bonus(char *file_name)
 /*
  * Divide de line in numbers split by ' '
  */
-void	fill_matrix_bonus(int *z_line, char *line)
+void	fill_matrix_bonus(int *z_line, char *line, int width)
 {
 	char	**nums;
 	int		i;
 
 	nums = ft_split(line, ' ');
 	i = 0;
-	while (nums[i])
+	while (nums[i] && i < width)
 	{
 		z_line[i] = ft_atoi(nums[i]);
 		free(nums[i]);
 		i++;
 	}
+	while (nums[i])
+		free(nums[i++]);
 	free(nums);
 }
 
@@ -108,31 +110,19 @@ void	fill_matrix_bonus(int *z_line, char *line)
  *	2. Assign memory in heap
  *	3. Fill the matrix
  */
+
 void	read_file_bonus(char *file_name, t_fdfb *data)
 {
-	int		fd;
-	int		i;
-	char	*line;
+	int	fd;
 
 	data->height = get_height_bonus(file_name);
 	data->width = get_width_bonus(file_name);
-	if (data->height <= 0 || data->width <= 0)
+	allocate_matrix_bonus(data);
+	if (data->z_matrix == NULL)
 		return ;
-	data->z_matrix = (int **)malloc(sizeof(int *) * data->height);
-	i = 0;
-	while (i < data->height)
-		data->z_matrix[i++] = (int *)malloc(sizeof(int) * data->width);
-	fd = open(file_name, O_RDONLY);
+	fd = open_file_bonus(file_name);
 	if (fd < 0)
 		return ;
-	i = 0;
-	line = get_next_line(fd);
-	while (line != NULL)
-	{
-		fill_matrix_bonus(data->z_matrix[i], line);
-		free(line);
-		i++;
-		line = get_next_line(fd);
-	}
+	fill_matrix_from_file_bonus(fd, data);
 	close(fd);
 }

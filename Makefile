@@ -1,111 +1,111 @@
-# Nombre de los ejecutables
+# Executable name
 NAME = fdf 
 
-# Directorios PATH
+# PATH directories
 BIN_PATH = ./bin
 SRC_PATH = ./src
 INCLUDE_PATH = ./include
 BUILD_PATH = ./build
 LIB_PATH = ./lib
 
-# Librerías
+# Libraries
 LIBFT = Libft
 GNL = Get_next_line
 PRINTF = Ft_printf
 MLX = minilibx-linux
 
-# Librería path externa libft
+# External library path for libft
 LIBFT_PATH = $(LIB_PATH)/$(LIBFT)
 LIBFT_LIB = $(LIBFT_PATH)/lib/$(LIBFT)
 
-# Librería path externa Ft_printf
+# External library path for Ft_printf
 PRINTF_PATH = $(LIB_PATH)/$(PRINTF)
 PRINTF_LIB = $(PRINTF_PATH)/lib/libftprintf.a
 
-# Librería path externa Get_next_line 
+# External library path for Get_next_line
 GNL_PATH = $(LIB_PATH)/$(GNL)
 GNL_LIB = $(GNL_PATH)/lib/libget_next_line.a
 
-# Librería path externa MiniLibX
+# External library path for MiniLibX
 MLX_PATH = $(LIB_PATH)/$(MLX)
 MLX_LIB = $(MLX_PATH)/libmlx.a
 
-# Paths de fuentes
+# Source paths
 SRC_OBLIGATORY_PATH = $(SRC_PATH)/Obligatory
 SRC_BONUS_PATH = $(SRC_PATH)/Bonus
 
-# Build Paths
+# Build paths
 OBLIGATORY_BUILD_PATH = $(BUILD_PATH)/Obligatory
 BONUS_BUILD_PATH = $(BUILD_PATH)/Bonus
 
-# Archivos .h
+# .h files
 INCLUDE_FILES_OBLIGATORY = fdf.h
 INCLUDE_FILES_BONUS = fdf_bonus.h
 
-# Include Path and Files
+# Include path and files
 INCLUDE_PATH_FILES_OBLIGATORY = $(INCLUDE_PATH)/$(INCLUDE_FILES_OBLIGATORY)
 INCLUDE_PATH_FILES_BONUS = $(INCLUDE_PATH)/$(INCLUDE_FILES_BONUS)
 
-# Todos los includes (incluye libft y ft_printf)
+# All includes (includes libft and ft_printf)
 ALL_INCLUDES = -I $(INCLUDE_PATH) -I $(LIBFT_PATH)/include -I $(GNL_PATH)/include -I $(PRINTF_PATH)/include -I $(MLX_PATH)
 
-# Archivos .c (sin path)
-C_FILES_OBLIGATORY = fdf.c read_file.c draw.c draw_utils.c draw_line_utils.c alg_utils.c
-C_FILES_BONUS = fdf_bonus.c read_file_bonus.c draw_bonus.c draw_utils_bonus.c draw_line_utils_bonus.c alg_utils_bonus.c keys_bonus.c
+# .c files (without path)
+C_FILES_OBLIGATORY = fdf.c read_file.c draw.c draw_utils.c draw_line_utils.c alg_utils.c read_file_utils.c
+C_FILES_BONUS = fdf_bonus.c read_file_bonus.c draw_bonus.c draw_utils_bonus.c draw_line_utils_bonus.c alg_utils_bonus.c keys_bonus.c read_file_utils_bonus.c
 
-# Archivos .c con path
+# .c files with path
 SRCS_OBLIGATORY = $(addprefix $(SRC_OBLIGATORY_PATH)/, $(C_FILES_OBLIGATORY))
 SRCS_BONUS = $(addprefix $(SRC_BONUS_PATH)/, $(C_FILES_BONUS))
 
-# Conversión de archivos .c a .o
+# Convert .c files to .o
 OBJS_OBLIGATORY = $(patsubst $(SRC_OBLIGATORY_PATH)/%.c, $(OBLIGATORY_BUILD_PATH)/%.o, $(SRCS_OBLIGATORY))
 OBJS_BONUS = $(patsubst $(SRC_BONUS_PATH)/%.c, $(BONUS_BUILD_PATH)/%.o, $(SRCS_BONUS))
 
-# Compilador y flags
+# Compiler and flags
 CC = cc
 CFLAGS = -Wall -Werror -Wextra -g
 AR = ar -rcs
 RM = rm -rf
 
-# Librerías externas (libft, get_next_line, ft_printf, minilibx)
+# External libraries (libft, get_next_line, ft_printf, minilibx)
 LIBS = -L$(LIBFT_PATH)/lib/Libft -L$(GNL_PATH)/lib -L$(PRINTF_PATH)/lib -L$(MLX_PATH) -lm -lft -lget_next_line -lftprintf -lmlx -lXext -lX11 -lm -lz
 
-# Reglas principales
+# Main rules
 all: libft printf get_next_line minilibx $(NAME)
 
-# Regla para la librería externa libft
+# Rule for the external libft library
 libft:
 	@echo "Building libft..."
 	@$(MAKE) -C $(LIBFT_PATH)
 
-# Regla para la librería externa ft_printf
+# Rule for the external ft_printf library
 printf:
 	@echo "Building ft_printf..."
 	@$(MAKE) -C $(PRINTF_PATH)
 
-# Regla para la librería externa Gnl 
+# Rule for the external Gnl library
 get_next_line:
 	@echo "Building GNL..."
 	@$(MAKE) -C $(GNL_PATH)
 
-# Regla para la librería externa MiniLibX
+# Rule for the external MiniLibX library
 minilibx:
 	@echo "Building MiniLibX..."
 	@$(MAKE) -C $(MLX_PATH)
 
-# Compilación
+# Compilation
 $(NAME): $(OBJS_OBLIGATORY) $(LIBFT_LIB) $(GNL_LIB) $(PRINTF_LIB) $(MLX_LIB)
 	@echo "Building $(NAME)..."
 	@mkdir -p $(BIN_PATH)/Obligatory
 	@$(CC) $(CFLAGS) $(OBJS_OBLIGATORY) $(LIBS) -o $(BIN_PATH)/Obligatory/$(NAME)
 	@echo "$(NAME) built successfully."
 
-# Regla para compilar los archivos objeto obligatorios
+# Rule to compile obligatory object files
 $(OBLIGATORY_BUILD_PATH)/%.o: $(SRC_OBLIGATORY_PATH)/%.c $(INCLUDE_PATH_FILES_OBLIGATORY)
 	@mkdir -p $(OBLIGATORY_BUILD_PATH)
 	$(CC) $(CFLAGS) $(ALL_INCLUDES) -c $< -o $@
 
-# Regla para compilar los archivos objeto bonus
+# Rule to compile bonus object files
 bonus: libft printf get_next_line minilibx $(OBJS_BONUS)
 	@echo "Building bonus..."
 	@mkdir -p $(BIN_PATH)/Bonus
@@ -116,12 +116,12 @@ $(BONUS_BUILD_PATH)/%.o: $(SRC_BONUS_PATH)/%.c $(INCLUDE_PATH_FILES_BONUS)
 	@mkdir -p $(BONUS_BUILD_PATH)
 	$(CC) $(CFLAGS) $(ALL_INCLUDES) -c $< -o $@
 
-# Limpiar archivos
+# Clean files
 clean:
 	@$(RM) $(BUILD_PATH)
 	@echo "Cleaned build files."
 
-# Limpiar todo, incluyendo libft, gnl, ft_printf y minilibx
+# Clean everything, including libft, gnl, ft_printf, and minilibx
 fclean: clean
 	@$(RM) $(BIN_PATH)
 	@$(MAKE) -C $(LIBFT_PATH) fclean
@@ -130,9 +130,8 @@ fclean: clean
 	@$(MAKE) -C $(MLX_PATH) clean
 	@echo "Cleaned all files."
 
-# Volver a compilar todo
+# Rebuild everything
 re: fclean all
 
-# Regla de PHONY
+# PHONY rule
 .PHONY: all clean fclean re bonus libft get_next_line printf minilibx
-

@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 20:23:41 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/14 17:22:16 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/30 15:26:25 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,19 +87,21 @@ int	get_width(char *file_name)
 /*
  * Divide de line in numbers split by ' '
  */
-void	fill_matrix(int *z_line, char *line)
+void	fill_matrix(int *z_line, char *line, int width)
 {
 	char	**nums;
 	int		i;
 
 	nums = ft_split(line, ' ');
 	i = 0;
-	while (nums[i])
+	while (nums[i] && i < width)
 	{
 		z_line[i] = ft_atoi(nums[i]);
 		free(nums[i]);
 		i++;
 	}
+	while (nums[i])
+		free(nums[i++]);
 	free(nums);
 }
 
@@ -108,31 +110,19 @@ void	fill_matrix(int *z_line, char *line)
  *	2. Assign memory in heap
  *	3. Fill the matrix
  */
+
 void	read_file(char *file_name, t_fdf *data)
 {
-	int		fd;
-	int		i;
-	char	*line;
+	int	fd;
 
 	data->height = get_height(file_name);
 	data->width = get_width(file_name);
-	if (data->height <= 0 || data->width <= 0)
+	allocate_matrix(data);
+	if (data->z_matrix == NULL)
 		return ;
-	data->z_matrix = (int **)malloc(sizeof(int *) * data->height);
-	i = 0;
-	while (i < data->height)
-		data->z_matrix[i++] = (int *)malloc(sizeof(int) * data->width);
-	fd = open(file_name, O_RDONLY);
+	fd = open_file(file_name);
 	if (fd < 0)
 		return ;
-	i = 0;
-	line = get_next_line(fd);
-	while (line != NULL)
-	{
-		fill_matrix(data->z_matrix[i], line);
-		free(line);
-		i++;
-		line = get_next_line(fd);
-	}
+	fill_matrix_from_file(fd, data);
 	close(fd);
 }

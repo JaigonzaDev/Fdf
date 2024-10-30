@@ -6,19 +6,20 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 20:23:37 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/15 12:17:07 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/30 15:15:45 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf.h"
+
 /*
  *------------------------------------------
  *	Trigger function to close(x) event
  *------------------------------------------
  */
-int	close_window(void *param)
+int	close_window(t_fdf *data)
 {
-	(void)param;
+	cleanup(data);
 	exit(0);
 }
 
@@ -49,7 +50,10 @@ int	deal_key(int key, t_fdf *data)
 	else if (key == 45)
 		data->zoom -= 1;
 	else if (key == 65307)
+	{
+		cleanup(data);
 		exit(0);
+	}
 	mlx_clear_window(data->mlx_ptr, data->win_ptr);
 	draw(data);
 	return (0);
@@ -79,7 +83,7 @@ void	init_data(t_fdf *data)
  */
 void	manage_mlx(t_fdf *data)
 {
-	mlx_hook(data->win_ptr, 17, 0, close_window, NULL);
+	mlx_hook(data->win_ptr, 17, 0, close_window, data);
 	mlx_key_hook(data->win_ptr, deal_key, data);
 	mlx_loop(data->mlx_ptr);
 }
@@ -106,5 +110,6 @@ int	main(int argc, char **argv)
 	read_file(argv[1], &data);
 	draw(&data);
 	manage_mlx(&data);
+	cleanup(&data);
 	return (0);
 }

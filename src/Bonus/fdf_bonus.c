@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 16:43:12 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/15 12:19:15 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/10/30 15:43:38 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,9 @@
  *	Trigger function to close(x) event
  *------------------------------------------
  */
-int	close_window_bonus(void *param)
+int	close_window_bonus(t_fdfb *data)
 {
-	(void)param;
+	cleanup_bonus(data);
 	exit(0);
 }
 
@@ -31,13 +31,15 @@ int	close_window_bonus(void *param)
  */
 int	deal_key_bonus(int key, t_fdfb *data)
 {
-	ft_printf("%d\n", key);
 	move_view(key, data);
 	zoom_view(key, data);
 	change_angle(key, data);
 	change_focal_length(key, data);
 	if (key == 65307)
+	{
+		cleanup_bonus(data);
 		exit(0);
+	}
 	mlx_clear_window(data->mlx_ptr, data->win_ptr);
 	draw_bonus(data);
 	return (0);
@@ -68,7 +70,7 @@ void	init_data_bonus(t_fdfb *data)
  */
 void	manage_mlx_bonus(t_fdfb *data)
 {
-	mlx_hook(data->win_ptr, 17, 0, close_window_bonus, NULL);
+	mlx_hook(data->win_ptr, 17, 0, close_window_bonus, data);
 	mlx_key_hook(data->win_ptr, deal_key_bonus, data);
 	mlx_loop(data->mlx_ptr);
 }

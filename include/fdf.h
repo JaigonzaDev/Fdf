@@ -39,7 +39,7 @@ typedef struct s_fpoint
 	t_fputils	utils;
 }				t_fpoint;
 
-int				close_window(void *param);
+int				close_window(t_fdf *data);
 int				deal_key(int key, t_fdf *data);
 void			init_data(t_fdf *data);
 void			manage_mlx(t_fdf *data);
@@ -47,7 +47,7 @@ void			manage_mlx(t_fdf *data);
 int				ft_wdcounter(char *line, char key);
 int				get_height(char *file_name);
 int				get_width(char *file_name);
-void			fill_matrix(int *z_line, char *line);
+void			fill_matrix(int *z_line, char *line, int width);
 void			read_file(char *file_name, t_fdf *data);
 
 void			alg_xiolin_wu(t_fpoint fp, t_fdf *data);
@@ -69,4 +69,10 @@ void			isometric(float *x, float *y, int z, t_fdf *data);
 void			data_shift(t_fpoint *fp, t_fdf *data);
 void			data_zoom(t_fpoint *fp, t_fdf *data);
 void			draw_line(t_fpoint *fp, t_fdf *data);
+
+void			free_matrix(int **matrix);
+void			cleanup(t_fdf *data);
+void			allocate_matrix(t_fdf *data);
+void			fill_matrix_from_file(int fd, t_fdf *data);
+int				open_file(char *file_name);
 #endif
