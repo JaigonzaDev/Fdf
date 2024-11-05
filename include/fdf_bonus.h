@@ -1,9 +1,22 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf_bonus.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/11/05 21:02:46 by jaigonza          #+#    #+#             */
+/*   Updated: 2024/11/05 21:05:24 by jaigonza         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef FDF_BONUS_H
 # define FDF_BONUS_H
 
 # include "fdf.h"
 
 # define PI 3.14159
+
 typedef struct s_fdfb
 {
 	int			width;
