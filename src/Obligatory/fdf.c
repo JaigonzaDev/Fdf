@@ -6,7 +6,7 @@
 /*   By: jaigonza <jaigonza@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/13 20:23:37 by jaigonza          #+#    #+#             */
-/*   Updated: 2024/10/30 15:15:45 by jaigonza         ###   ########.fr       */
+/*   Updated: 2024/11/05 21:22:28 by jaigonza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,7 +101,7 @@ int	main(int argc, char **argv)
 {
 	t_fdf	data;
 
-	if (argc != 2)
+	if (argc != 2 || open_file(argv[1]) == -1)
 	{
 		ft_printf("Usage: %s <map_file>\n", argv[0]);
 		return (1);
