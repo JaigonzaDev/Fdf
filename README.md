@@ -11,15 +11,15 @@ The **Fdf** project at 42 involves creating a C program that generates a 3D grap
 
 ## Project Requirements
 - **Language**: C
-- **Libraries**: mlx (MiniLibX or a similar library)
+- **Libraries**: mlx (MiniLibX)
 - **Compilation Flags**: -Wall -Wextra -Werror
 - **Output**: Executable file that reads `.fdf` files and displays them in a graphical window
 - **Makefile**: Required with rules `all`, `clean`, `fclean`, `re`, and possibly `bonus`.
 
 ## Learning Goals
 - Understand the mathematical concepts behind isometric projections.
-- Develop memory management skills to handle graphical buffers and pixel manipulation.
-- Improve understanding of graphics programming concepts such as line-drawing algorithms and color manipulation.
+- Develop memory management skills to handle graphical and pixel manipulation.
+- Improve understanding of graphics programming concepts such as line-drawing algorithms.
 - Enhance skills with Makefiles, compilation flags, and shell commands.
 
 ## Instructions
